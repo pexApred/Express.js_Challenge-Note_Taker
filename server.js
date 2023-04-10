@@ -34,8 +34,8 @@ app.get('/api/notes/:title', (req, res) => {
     if (req.params.title) {
         console.info(`${req.method} request recieved to get a single note`);
         const noteTitle = req.params.title;
-        for (let i = 0; i < notes.length; i++) {
-        const currentNote = notes[i];
+        for (let i = 0; i < db.length; i++) {
+        const currentNote = db[i];
         if (currentNote.title === noteTitle) {
             res.json(currentNote);
             return;
@@ -61,7 +61,10 @@ app.post(`/api/notes`, (req, res) => {
         const newNote = {
             title,
             text,
+            id: db.length + 1 
         };
+
+        db.push(newNote);
 
         const response = {
             status: 'success',
@@ -70,10 +73,16 @@ app.post(`/api/notes`, (req, res) => {
 
         console.log(response);
         res.status(201).json(response);
+        return;
     } else {
         res.status(500).json('Error in posting note');
     }
 });
+
+// DELETE Request to remove a note
+app.delete('/api/notes/:id', (req, res) => {
+    
+})
 
 // Wildcard route to direct users to a home page
 app.get('*', (req, res) =>
