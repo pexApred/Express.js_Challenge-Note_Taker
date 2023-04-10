@@ -24,15 +24,17 @@ app.get('/notes', (req, res) =>
 );
 
 // GET request for notes
-app.get('/api/notes', (req, res) => 
-    res.json(db)
-);
+app.get('/api/notes', (req, res) => {
+    console.info(` Get /api/notes`);
+    res.status(200).json(db)
+});
 
 // GET a single note
 app.get('/api/notes/:title', (req, res) => {
     if (req.params.title) {
-      const noteTitle = req.params.title;
-      for (let i = 0; i < notes.length; i++) {
+        console.info(`${req.method} request recieved to get a single note`);
+        const noteTitle = req.params.title;
+        for (let i = 0; i < notes.length; i++) {
         const currentNote = notes[i];
         if (currentNote.title === noteTitle) {
             res.json(currentNote);
@@ -42,6 +44,34 @@ app.get('/api/notes/:title', (req, res) => {
       res.status(404).send('Note not found');
     } else {
         res.status(400).send('Title not provided'); 
+    }
+});
+
+// POST request to add a Note
+app.post(`/api/notes`, (req, res) => {
+    // Log that a POST request was recieved
+    console.info(`${req.method} request recieved to add a note`);
+
+    // Destructuring assignment for the items in req.body
+    const { title, text } = req.body;
+
+    // If all required properties are present
+    if (title && text) {
+        // Variable for the object we will save
+        const newNote = {
+            title,
+            text,
+        };
+
+        const response = {
+            status: 'success',
+            body: newNote,
+        };
+
+        console.log(response);
+        res.status(201).json(response);
+    } else {
+        res.status(500).json('Error in posting note');
     }
 });
 
