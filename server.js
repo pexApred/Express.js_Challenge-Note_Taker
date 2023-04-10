@@ -1,11 +1,12 @@
 // const express = require('express');
 const express = require('express');
 const path = require('path');
+const fs = require('fs');
 
 const PORT = process.env.PORT || 3001;
 
 let db = require('./db/db.json');
-
+const { v4:uuid } = require('uuid');
 const app = express();
 
 // Middleware for parsing JSON and urlencoded form data
@@ -57,32 +58,56 @@ app.post(`/api/notes`, (req, res) => {
 
     // If all required properties are present
     if (title && text) {
+        const id = uuid();
         // Variable for the object we will save
         const newNote = {
             title,
             text,
-            id: db.length + 1 
+            id,
         };
 
-        db.push(newNote);
+        fs.readFile('./db/db.json', 'utf8', (err, data) => {
+            if (err) {
+                console.error(err);
+                res.status(500).json('Error reading database');
+                return;
+            }
+            const notes = JSON.parse(data);
 
+            notes.push(newNote);
+            db.push(newNote);
+
+            fs.writeFile('./db/db.json', JSON.stringify(notes), 'utf8', err => {
+                if (err) {
+                    console.error(err);
+                    res.status(500).json('Error writing to database');
+                    return;
+                }
+            })
+        
         const response = {
             status: 'success',
             body: newNote,
         };
-
         console.log(response);
         res.status(201).json(response);
-        return;
+        });
     } else {
-        res.status(500).json('Error in posting note');
+        res.status(400).json('Title and text are required');
     }
 });
 
 // DELETE Request to remove a note
 app.delete('/api/notes/:id', (req, res) => {
+    console.info(`${req.method} request received to delete a note`);
+
+    const notes = JSON.parse(fs.readFileSync('./db/db.json'));
+
+    const updatedNotes = notes.filter(note => note.id != req.params.id);
     
-})
+    fs.writeFileSync('./db/db.json', JSON.stringify(updatedNotes));
+    res.json(updatedNotes);
+});
 
 // Wildcard route to direct users to a home page
 app.get('*', (req, res) =>
