@@ -98,12 +98,12 @@ app.post(`/api/notes`, (req, res) => {
 });
 
 // DELETE Request to remove a note
-app.delete('/api/notes/:id', (req, res) => {
+app.delete('/api/notes/:title', (req, res) => {
     console.info(`${req.method} request received to delete a note`);
 
     const notes = JSON.parse(fs.readFileSync('./db/db.json'));
 
-    const updatedNotes = notes.filter(note => note.id != req.params.id);
+    const updatedNotes = notes.filter(note => note.title != req.params.title);
     
     fs.writeFileSync('./db/db.json', JSON.stringify(updatedNotes));
     res.json(updatedNotes);
