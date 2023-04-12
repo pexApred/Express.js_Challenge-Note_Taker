@@ -77,7 +77,7 @@ app.post(`/api/notes`, (req, res) => {
             notes.push(newNote);
             db.push(newNote);
 
-            fs.writeFile('./db/db.json', JSON.stringify(notes), 'utf8', err => {
+            fs.writeFile('./db/db.json', JSON.stringify(db), 'utf8', err => {
                 if (err) {
                     console.error(err);
                     res.status(500).json('Error writing to database');
@@ -100,13 +100,28 @@ app.post(`/api/notes`, (req, res) => {
 // DELETE Request to remove a note
 app.delete('/api/notes/:id', (req, res) => {
     console.info(`${req.method} request received to delete a note`);
-
-    const notes = JSON.parse(fs.readFileSync('./db/db.json'));
-
-    const updatedNotes = notes.filter(note => note.id != req.params.id);
+    const noteId = req.params.id;
+    const index = db.findIndex(note => note.id === noteId);
+    if (index !== -1) {
+        db.splice(index, 1);
     
-    fs.writeFileSync('./db/db.json', JSON.stringify(updatedNotes));
-    res.json(updatedNotes);
+        fs.writeFile('./db/db.json', JSON.stringify(db), 'utf8', err => {
+            if (err) {
+                console.error(err);
+                res.status(500).json('Error writing to database');
+                return;
+            }
+            const response = {
+                status: 'success',
+                message: 'Note successfully deleted',
+            };
+            console.log(response);
+            res.status(200).json(response);
+        });
+    } else {
+        res.status(404).send('Note not found');  
+    }
+ 
 });
 
 // Wildcard route to direct users to a home page
