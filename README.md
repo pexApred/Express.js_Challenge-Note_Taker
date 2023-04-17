@@ -23,8 +23,9 @@ What are the steps required to install your project? Provide a step-by-step desc
 
 Navigate to /notes and create a new task. Save task and it will appear on left side list. To delete task, hit trash bin for each note.
 
-An example screenshot below:
+Link to Heroku: https://dashboard.heroku.com/apps/thawing-plains-80442
 
+An example screenshot below:
 ![Note-Taker](/Express.js_Challenge-Note_Taker/Assets/11-express-homework-demo-01.png)
 
 ## Credits
